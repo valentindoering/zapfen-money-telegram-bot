@@ -6,6 +6,7 @@ export interface TUser {
     name: string;
     zapfen: number;
     sepa: boolean;
+    nDaysBelowMin: number;
   }
   
 export type TUsers = {

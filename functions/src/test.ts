@@ -2,7 +2,7 @@ import TelegramBot from "node-telegram-bot-api"
 import { TLogger } from "./logger"
 import { TTelegramClient } from "./telegramClient"
 import { TUser, TUsers, TZapfenStore } from "./zapfenStore"
-import { zapfenMain } from "./zapfenMain"
+import { dailyZapfenFees, zapfenMain } from "./zapfenMain"
 
 class DummyZapfenStore implements TZapfenStore {
     private users = users
@@ -90,6 +90,20 @@ async function testScenario(senderName: string, message: string, users: TUsers):
     return users
 }
 
+async function dailyFeeTestScenario(users: TUsers): Promise<TUsers> {
+    console.log(`dailyFeeTestScenario(${JSON.stringify(users)}) ------------------------------------------------------------------------------------------------------------------------------`)
+    const response = {
+        send: (txt: string) => {
+            console.log(txt)
+        }
+    }
+
+    await dailyZapfenFees(DummyTelegramClient, DummyLogger, DummyZapfenStore, response);
+
+    console.log(`------------------------------------------------------------------------------------------------------------------------------testScenario done, users: ${JSON.stringify(users)}`) 
+    return users
+}
+
 // ----------------------------------------------------------------
 // start data, referenced in DummyZapfenStore
 const users: TUsers = {
@@ -97,24 +111,30 @@ const users: TUsers = {
     "4375933": {
         "zapfen": 25,
         "name": "Valentin",
-        "sepa": false
+        "sepa": true,
+        "nDaysBelowMin": 4
     }, 
     "8856722": {
         "zapfen": 63,
         "name": "Sandra",
-        "sepa": false
+        "sepa": true,
+        "nDaysBelowMin": 0
     }, 
     "2992922": {
         "zapfen": 2,
         "name": "Dennis",
-        "sepa": false
+        "sepa": true,
+        "nDaysBelowMin": 7
     }
 }
 
 async function test() {
     // await testScenario("Valentin", "Sandra 1 Zapfen")
     // await testScenario("Sandra", "SEPA Zapfen off", users)
-    await testScenario("Dennis", "SEPA 10 Zapfen", users)
+    // await testScenario("Dennis", "SEPA 10 Zapfen", users)
+    await testScenario("Valentin", "SEPA 10 Zapfen", users)
+
+    await dailyFeeTestScenario(users)
 
 }
 
